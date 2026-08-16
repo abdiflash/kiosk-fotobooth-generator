@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Pass Code Generator — Kiosk Photobooth Pro 12.0</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --panel-bg: #1e293b;
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --text-title: #f8fafc;
+            --text-body: #94a3b8;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-title);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .admin-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 520px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 0.8rem;
+            color: var(--text-body);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-body);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--panel-border);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-preset {
+            background: #0f172a;
+            border: 1px solid var(--panel-border);
+            color: var(--text-title);
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preset:hover, .btn-preset.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-generate:hover {
+            background: var(--accent-hover);
+        }
+
+        .result-box {
+            margin-top: 24px;
+            background: #0f172a;
+            border: 1px dashed var(--panel-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: none;
+        }
+
+        .result-box.active {
+            display: block;
+        }
+
+        .code-display {
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--success);
+            text-align: center;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            flex: 1;
+            background: #334155;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #475569;
+        }
+
+        .info-note {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 16px;
+            text-align: center;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <div class="header">
+            <h1>🛡️ PASS CODE GENERATOR</h1>
+            <p>Generator Lisensi SHA-256 untuk Kiosk Photobooth Pro</p>
+        </div>
+
+        <div class="form-group">
+            <label>System Secret Key</label>
+            <input type="text" id="secretKeyInput" value="KIOSK_PRO_SECRET_2026" readonly style="color: #64748b; cursor: not-allowed;">
+        </div>
+
+        <div class="form-group">
+            <label>Durasi Akses (Jam)</label>
+            <input type="number" id="hoursInput" min="1" value="24" placeholder="Masukkan jumlah jam">
+            
+            <div class="preset-grid">
+                <button class="btn-preset active" data-hours="24">1 Hari (24h)</button>
+                <button class="btn-preset" data-hours="72">3 Hari (72h)</button>
+                <button class="btn-preset" data-hours="168">7 Hari (168h)</button>
+                <button class="btn-preset" data-hours="720">30 Hari (720h)</button>
+            </div>
+        </div>
+
+        <button class="btn-generate" id="generateBtn">⚡ GENERATE PASS CODE</button>
+
+        <div class="result-box" id="resultBox">
+            <div class="form-group" style="margin-bottom: 6px;">
+                <label>Pass Code Aktif</label>
+            </div>
+            <div class="code-display" id="passCodeOutput">PASS24-XXXX-XXXX</div>
+            
+            <div class="action-group">
+                <button class="btn-action" id="copyCodeBtn">📋 Salin Kode</button>
+                <button class="btn-action" id="copyUrlBtn">🔗 Salin URL Aktivasi Direct</button>
+            </div>
+        </div>
+
+        <p class="info-note">
+            🔒 Kode menggunakan enkripsi validasi SHA-256. Durasi jam yang dihasilkan akan ditambahkan secara akumulatif saat diinput di photobooth.
+        </p>
+    </div>
+
+    <script>
+        const SYSTEM_SECRET_KEY = "KIOSK_PRO_SECRET_2026";
+
+        const hoursInput = document.getElementById('hoursInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultBox = document.getElementById('resultBox');
+        const passCodeOutput = document.getElementById('passCodeOutput');
+        const copyCodeBtn = document.getElementById('copyCodeBtn');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
+        const presetBtns = document.querySelectorAll('.btn-preset');
+
+        let currentGeneratedCode = "";
+
+        // Preset button handlers
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                hoursInput.value = btn.dataset.hours;
+            });
+        });
+
+        hoursInput.addEventListener('input', () => {
+            presetBtns.forEach(b => b.classList.remove('active'));
+        });
+
+        // SHA-256 Pass Code Generator Function
+        async function generatePassCode(hours) {
+            // Generate Random 4-character Salt (A-Z, 0-9)
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let salt = '';
+            for (let i = 0; i < 4; i++) {
+                salt += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            // Build SHA-256 string input
+            const input = `${hours}-${salt}-${SYSTEM_SECRET_KEY}`;
+            const msgBuffer = new TextEncoder().encode(input);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const checksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 4).toUpperCase();
+
+            return `PASS${hours}-${salt}-${checksum}`;
+        }
+
+        // Generate Event
+        generateBtn.addEventListener('click', async () => {
+            const hours = parseInt(hoursInput.value, 10);
+            if (!hours || hours <= 0) {
+                alert("Masukkan jumlah jam yang valid!");
+                return;
+            }
+
+            currentGeneratedCode = await generatePassCode(hours);
+            passCodeOutput.textContent = currentGeneratedCode;
+            resultBox.classList.add('active');
+        });
+
+        // Copy Code Only
+        copyCodeBtn.addEventListener('click', () => {
+            if (!currentGeneratedCode) return;
+            navigator.clipboard.writeText(currentGeneratedCode);
+            copyCodeBtn.textContent = '✅ Tersalin!';
+            setTimeout(() => copyCodeBtn.textContent = '📋 Salin Kode', 2000);
+        });
+
+        // Copy Direct Activation URL (Auto-activate when opened)
+        copyUrlBtn.addEventListener('click', () => {
+            if (!currentGeneratedCode) return;
+            const baseUrl = window.location.href.replace('generator-photobooth.html', 'index.html').split('?')[0];
+            const directUrl = `${baseUrl}?pass=${currentGeneratedCode}`;
+            navigator.clipboard.writeText(directUrl);
+            copyUrlBtn.textContent = '✅ Link Tersalin!';
+            setTimeout(() => copyUrlBtn.textContent = '🔗 Salin URL Aktivasi Direct', 2000);
+        });
+    </script>
+</body>
+</html>
