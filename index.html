@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Pass Code Generator — Kiosk Photobooth Pro 12.0</title>
+    <title>Admin Pass Code Generator — Kiosk Photobooth Pro 13.0</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,12 +115,20 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            text-align: center;
         }
 
         .btn-preset:hover, .btn-preset.active {
             background: var(--accent);
             border-color: var(--accent);
             color: #fff;
+        }
+
+        .duration-preview {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #10b981;
+            font-weight: 600;
         }
 
         .btn-generate {
@@ -206,7 +214,7 @@
     <div class="admin-card">
         <div class="header">
             <h1>🛡️ PASS CODE GENERATOR</h1>
-            <p>Generator Lisensi SHA-256 untuk Kiosk Photobooth Pro</p>
+            <p>Generator Lisensi SHA-256 (Kelipatan Rp 50.000 / 24 Jam)</p>
         </div>
 
         <div class="form-group">
@@ -215,14 +223,18 @@
         </div>
 
         <div class="form-group">
-            <label>Durasi Akses (Jam)</label>
-            <input type="number" id="hoursInput" min="1" value="24" placeholder="Masukkan jumlah jam">
+            <label>Nominal Pembayaran (Rp)</label>
+            <input type="number" id="amountInput" step="50000" min="50000" value="50000" placeholder="Contoh: 50000">
             
             <div class="preset-grid">
-                <button class="btn-preset active" data-hours="24">1 Hari (24h)</button>
-                <button class="btn-preset" data-hours="72">3 Hari (72h)</button>
-                <button class="btn-preset" data-hours="168">7 Hari (168h)</button>
-                <button class="btn-preset" data-hours="720">30 Hari (720h)</button>
+                <button class="btn-preset active" data-amount="50000">50K (1 Hari)</button>
+                <button class="btn-preset" data-amount="100000">100K (2 Hari)</button>
+                <button class="btn-preset" data-amount="150000">150K (3 Hari)</button>
+                <button class="btn-preset" data-amount="300000">300K (6 Hari)</button>
+            </div>
+
+            <div class="duration-preview" id="durationPreview">
+                ⏱️ Durasi Lisensi: 24 Jam (1 Hari)
             </div>
         </div>
 
@@ -241,14 +253,15 @@
         </div>
 
         <p class="info-note">
-            🔒 Kode menggunakan enkripsi validasi SHA-256. Durasi jam yang dihasilkan akan ditambahkan secara akumulatif saat diinput di photobooth.
+            🔒 Kode dikalkulasi otomatis dari nominal transfer (Rp 50.000 = 24 Jam). Durasi akan ditambahkan secara akumulatif saat diinput di photobooth.
         </p>
     </div>
 
     <script>
         const SYSTEM_SECRET_KEY = "KIOSK_PRO_SECRET_2026";
 
-        const hoursInput = document.getElementById('hoursInput');
+        const amountInput = document.getElementById('amountInput');
+        const durationPreview = document.getElementById('durationPreview');
         const generateBtn = document.getElementById('generateBtn');
         const resultBox = document.getElementById('resultBox');
         const passCodeOutput = document.getElementById('passCodeOutput');
@@ -258,29 +271,46 @@
 
         let currentGeneratedCode = "";
 
-        // Preset button handlers
+        // Update teks durasi otomatis berdasarkan nominal
+        function updateDurationText() {
+            const amount = parseInt(amountInput.value, 10) || 0;
+            const multiplier = Math.floor(amount / 50000);
+            const hours = multiplier * 24;
+            const days = (hours / 24).toFixed(1).replace('.0', '');
+
+            if (amount < 50000) {
+                durationPreview.style.color = '#ef4444';
+                durationPreview.textContent = '⚠️ Minimal pembayaran Rp 50.000 (24 Jam)';
+            } else {
+                durationPreview.style.color = '#10b981';
+                durationPreview.textContent = `⏱️ Durasi Lisensi: ${hours} Jam (${days} Hari)`;
+            }
+            return hours;
+        }
+
+        // Event handler tombol preset nominal
         presetBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 presetBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                hoursInput.value = btn.dataset.hours;
+                amountInput.value = btn.dataset.amount;
+                updateDurationText();
             });
         });
 
-        hoursInput.addEventListener('input', () => {
+        amountInput.addEventListener('input', () => {
             presetBtns.forEach(b => b.classList.remove('active'));
+            updateDurationText();
         });
 
         // SHA-256 Pass Code Generator Function
         async function generatePassCode(hours) {
-            // Generate Random 4-character Salt (A-Z, 0-9)
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let salt = '';
             for (let i = 0; i < 4; i++) {
                 salt += chars.charAt(Math.floor(Math.random() * chars.length));
             }
 
-            // Build SHA-256 string input
             const input = `${hours}-${salt}-${SYSTEM_SECRET_KEY}`;
             const msgBuffer = new TextEncoder().encode(input);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -292,12 +322,13 @@
 
         // Generate Event
         generateBtn.addEventListener('click', async () => {
-            const hours = parseInt(hoursInput.value, 10);
-            if (!hours || hours <= 0) {
-                alert("Masukkan jumlah jam yang valid!");
+            const amount = parseInt(amountInput.value, 10);
+            if (!amount || amount < 50000) {
+                alert("Nominal pembayaran minimal Rp 50.000!");
                 return;
             }
 
+            const hours = Math.floor(amount / 50000) * 24;
             currentGeneratedCode = await generatePassCode(hours);
             passCodeOutput.textContent = currentGeneratedCode;
             resultBox.classList.add('active');
@@ -311,7 +342,7 @@
             setTimeout(() => copyCodeBtn.textContent = '📋 Salin Kode', 2000);
         });
 
-        // Copy Direct Activation URL (Auto-activate when opened)
+        // Copy Direct Activation URL
         copyUrlBtn.addEventListener('click', () => {
             if (!currentGeneratedCode) return;
             const baseUrl = window.location.href.replace('generator-photobooth.html', 'index.html').split('?')[0];
@@ -320,6 +351,9 @@
             copyUrlBtn.textContent = '✅ Link Tersalin!';
             setTimeout(() => copyUrlBtn.textContent = '🔗 Salin URL Aktivasi Direct', 2000);
         });
+
+        // Initial preview calculation
+        updateDurationText();
     </script>
 </body>
 </html>
